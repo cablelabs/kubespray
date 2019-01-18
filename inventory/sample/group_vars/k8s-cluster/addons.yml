@@ -69,3 +69,9 @@ ingress_nginx_enabled: false
 # Cert manager deployment
 cert_manager_enabled: false
 # cert_manager_namespace: "cert-manager"
+
+# Monitoring apps
+efk_enabled: true
+
+# Istio deployment
+istio_enabled: true
