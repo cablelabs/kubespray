@@ -293,6 +293,15 @@ dnsautoscaler_image_repo: "gcr.io/google_containers/cluster-proportional-autosca
 dnsautoscaler_image_tag: "{{ dnsautoscaler_version }}"
 test_image_repo: busybox
 test_image_tag: latest
+elasticsearch_version: "v2.4.1"
+elasticsearch_image_repo: "gcr.io/google_containers/elasticsearch"
+elasticsearch_image_tag: "{{ elasticsearch_version }}"
+fluentd_version: "1.22"
+fluentd_image_repo: "gcr.io/google_containers/fluentd-elasticsearch"
+fluentd_image_tag: "{{ fluentd_version }}"
+kibana_version: "v4.6.1"
+kibana_image_repo: "gcr.io/google_containers/kibana"
+kibana_image_tag: "{{ kibana_version }}"
 busybox_image_repo: busybox
 busybox_image_tag: 1.29.2
 helm_version: "v2.12.2"
@@ -734,6 +743,33 @@ downloads:
     repo: "{{ test_image_repo }}"
     tag: "{{ test_image_tag }}"
     sha256: "{{ testbox_digest_checksum|default(None) }}"
+
+  elasticsearch:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ elasticsearch_image_repo }}"
+    tag: "{{ elasticsearch_image_tag }}"
+    sha256: "{{ elasticsearch_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  fluentd:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ fluentd_image_repo }}"
+    tag: "{{ fluentd_image_tag }}"
+    sha256: "{{ fluentd_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  kibana:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ kibana_image_repo }}"
+    tag: "{{ kibana_image_tag }}"
+    sha256: "{{ kibana_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
 
   helm:
     enabled: "{{ helm_enabled }}"
