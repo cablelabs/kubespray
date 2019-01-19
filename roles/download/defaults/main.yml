@@ -52,6 +52,7 @@ calico_rr_version: "v0.6.1"
 
 flannel_version: "v0.11.0"
 flannel_cni_version: "v0.3.0"
+istio_version: "0.2.6"
 
 cni_version: "v0.6.0"
 
@@ -63,12 +64,14 @@ kube_router_version: "v0.2.1"
 multus_version: "v3.1.autoconf"
 
 # Download URLs
+istioctl_download_url: "https://storage.googleapis.com/istio-release/releases/{{ istio_version }}/istioctl/istioctl-linux"
 kubeadm_download_url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubeadm_version }}/bin/linux/{{ image_arch }}/kubeadm"
 hyperkube_download_url: "https://storage.googleapis.com/kubernetes-release/release/{{ kube_version }}/bin/linux/{{ image_arch }}/hyperkube"
 etcd_download_url: "https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-{{ image_arch }}.tar.gz"
 cni_download_url: "https://github.com/containernetworking/plugins/releases/download/{{ cni_version }}/cni-plugins-{{ image_arch }}-{{ cni_version }}.tgz"
 
 # Checksums
+istioctl_checksum: fd703063c540b8c0ab943f478c05ab257d88ae27224c746a27d0526ddbf7c370
 hyperkube_checksums:
   arm64:
     v1.10.0: 79291c36a8f6ca1350bf6f2344922cbe0b366cd5b376abb83eb207baaf57d379
@@ -212,6 +215,24 @@ calico_policy_image_repo: "quay.io/calico/kube-controllers"
 calico_policy_image_tag: "{{ calico_policy_version }}-{{ image_arch }}"
 calico_rr_image_repo: "quay.io/calico/routereflector"
 calico_rr_image_tag: "{{ calico_rr_version }}-{{ image_arch }}"
+istio_proxy_image_repo: docker.io/istio/proxy
+istio_proxy_image_tag: "{{ istio_version }}"
+istio_proxy_init_image_repo: docker.io/istio/proxy_init
+istio_proxy_init_image_tag: "{{ istio_version }}"
+istio_ca_image_repo: docker.io/istio/istio-ca
+istio_ca_image_tag: "{{ istio_version }}"
+istio_mixer_image_repo: docker.io/istio/mixer
+istio_mixer_image_tag: "{{ istio_version }}"
+istio_pilot_image_repo: docker.io/istio/pilot
+istio_pilot_image_tag: "{{ istio_version }}"
+istio_proxy_debug_image_repo: docker.io/istio/proxy_debug
+istio_proxy_debug_image_tag: "{{ istio_version }}"
+istio_sidecar_initializer_image_repo: docker.io/istio/sidecar_initializer
+istio_sidecar_initializer_image_tag: "{{ istio_version }}"
+istio_statsd_image_repo: prom/statsd-exporter
+istio_statsd_image_tag: latest
+hyperkube_image_repo: "{{ kube_image_repo }}/hyperkube-{{ image_arch }}"
+hyperkube_image_tag: "{{ kube_version }}"
 pod_infra_image_repo: "gcr.io/google_containers/pause-{{ image_arch }}"
 pod_infra_image_tag: "{{ pod_infra_version }}"
 install_socat_image_repo: "xueshanf/install-socat"
@@ -361,6 +382,93 @@ downloads:
     unarchive: false
     owner: "root"
     mode: "0755"
+    groups:
+      - k8s-cluster
+
+  istioctl:
+    enabled: "{{ istio_enabled }}"
+    file: true
+    version: "{{ istio_version }}"
+    dest: "istio/istioctl"
+    sha256: "{{ istioctl_checksum }}"
+    source_url: "{{ istioctl_download_url }}"
+    url: "{{ istioctl_download_url }}"
+    unarchive: false
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master
+  istio_proxy:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_image_repo }}"
+    tag: "{{ istio_proxy_image_tag }}"
+    sha256: "{{ istio_proxy_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_proxy_init:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_init_image_repo }}"
+    tag: "{{ istio_proxy_init_image_tag }}"
+    sha256: "{{ istio_proxy_init_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_ca:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_ca_image_repo }}"
+    tag: "{{ istio_ca_image_tag }}"
+    sha256: "{{ istio_ca_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_mixer:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_mixer_image_repo }}"
+    tag: "{{ istio_mixer_image_tag }}"
+    sha256: "{{ istio_mixer_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_pilot:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_pilot_image_repo }}"
+    tag: "{{ istio_pilot_image_tag }}"
+    sha256: "{{ istio_pilot_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_proxy_debug:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_debug_image_repo }}"
+    tag: "{{ istio_proxy_debug_image_tag }}"
+    sha256: "{{ istio_proxy_debug_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_sidecar_initializer:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_sidecar_initializer_image_repo }}"
+    tag: "{{ istio_sidecar_initializer_image_tag }}"
+    sha256: "{{ istio_sidecar_initializer_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_statsd:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_statsd_image_repo }}"
+    tag: "{{ istio_statsd_image_tag }}"
+    sha256: "{{ istio_statsd_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  hyperkube:
+    enabled: "{{ kubeadm_enabled == false }}"
+    container: true
+    repo: "{{ hyperkube_image_repo }}"
+    tag: "{{ hyperkube_image_tag }}"
+    sha256: "{{ hyperkube_digest_checksum|default(None) }}"
     groups:
       - k8s-cluster
 
