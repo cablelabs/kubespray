@@ -75,3 +75,5 @@ efk_enabled: true
 
 # Istio deployment
 istio_enabled: false
+
+kubeadm_enabled: true
