@@ -74,4 +74,4 @@ cert_manager_enabled: false
 efk_enabled: true
 
 # Istio deployment
-istio_enabled: true
+istio_enabled: false
