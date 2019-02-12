@@ -24,12 +24,11 @@
 
 - name: "Kibana | Create Kibana service"
   kube:
-    filename: "{{kube_config_dir}}/kibana-service.yaml"
-    kubectl: "{{bin_dir}}/kubectl"
+    filename: "{{ kube_config_dir }}/kibana-service.yaml"
+    kubectl: "{{ bin_dir }}/kubectl"
     name: "kibana-logging"
     namespace: "kube-system"
     resource: "svc"
     state: "latest"
-    validate: false
   with_items: "{{ kibana_service_manifest.changed }}"
   run_once: true
