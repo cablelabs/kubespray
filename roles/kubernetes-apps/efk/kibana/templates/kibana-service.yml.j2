@@ -14,7 +14,7 @@ spec:
     protocol: TCP
     targetPort: ui
     nodePort: {{ kibana_node_port }}
-    type: NodePort
+  type: NodePort
   selector:
     k8s-app: kibana-logging
 
