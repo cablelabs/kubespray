@@ -4,3 +4,4 @@ kibana_mem_limit: 0M
 kibana_cpu_requests: 100m
 kibana_mem_requests: 0M
 kibana_service_port: 5601
+kibana_node_port: 30011
