@@ -47,6 +47,7 @@
     - { name: download_run_once, value: "{{ download_run_once }}" }
     - { name: deploy_netchecker, value: "{{ deploy_netchecker }}" }
     - { name: download_always_pull, value: "{{ download_always_pull }}" }
+    - { name: efk_enabled, value: "{{ efk_enabled }}" }
     - { name: helm_enabled, value: "{{ helm_enabled }}" }
     - { name: openstack_lbaas_enabled, value: "{{ openstack_lbaas_enabled }}" }
   ignore_errors: "{{ ignore_assert_errors }}"
@@ -75,7 +76,7 @@
 # NOTICE: the check blatantly ignores the inet6-case
 - name: Guarantee that enough network address space is available for all pods
   assert:
-    that: "{{ kubelet_max_pods | default(110) <= (2 ** (32 - kube_network_node_prefix)) - 2 }}"
+    that: "{{ (kubelet_max_pods | default(110)) | int <= (2 ** (32 - kube_network_node_prefix | int)) - 2 }}"
     msg: "Do not schedule more pods on a node than inet addresses are available."
   ignore_errors: "{{ ignore_assert_errors }}"
   when:
@@ -138,6 +139,8 @@
 - name: "Get current version of calico cluster version"
   shell: "{{ bin_dir }}/calicoctl version  | grep 'Cluster Version:' | awk '{ print $3}'"
   register: calico_version_on_server
+  async: 10
+  poll: 3
   run_once: yes
   delegate_to: "{{ groups['kube-master'][0] }}"
   when:
