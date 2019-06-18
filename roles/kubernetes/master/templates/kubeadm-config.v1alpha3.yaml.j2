@@ -103,6 +103,9 @@ apiServerExtraArgs:
 {% if kube_webhook_token_auth|default(false) %}
   authentication-token-webhook-config-file: {{ kube_config_dir }}/webhook-token-auth-config.yaml
 {% endif %}
+{% if kube_webhook_token_auth|default(false) %}
+  authentication-token-webhook-config-file: {{ kube_config_dir }}/webhook-token-auth-config.yaml
+{% endif %}
 {% if kube_encrypt_secret_data %}
   experimental-encryption-provider-config: {{ kube_cert_dir }}/secrets_encryption.yaml
 {% endif %}
@@ -134,6 +137,7 @@ controllerManagerExtraArgs:
   node-monitor-grace-period: {{ kube_controller_node_monitor_grace_period }}
   node-monitor-period: {{ kube_controller_node_monitor_period }}
   pod-eviction-timeout: {{ kube_controller_pod_eviction_timeout }}
+  node-cidr-mask-size: "{{ kube_network_node_prefix }}"
   node-cidr-mask-size: "{{ kube_network_node_prefix }}"
 {% if kube_version is version('v1.14', '<') %}
   address: {{ kube_controller_manager_bind_address }}

@@ -53,6 +53,7 @@ calico_typha_version: "v3.4.4"
 
 flannel_version: "v0.11.0"
 flannel_cni_version: "v0.3.0"
+istio_version: "0.2.6"
 
 cni_version: "v0.6.0"
 
@@ -64,6 +65,7 @@ kube_router_version: "v0.2.5"
 multus_version: "v3.1.autoconf"
 
 # Download URLs
+istioctl_download_url: "https://storage.googleapis.com/istio-release/releases/{{ istio_version }}/istioctl/istioctl-linux"
 kubeadm_download_url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubeadm_version }}/bin/linux/{{ image_arch }}/kubeadm"
 hyperkube_download_url: "https://storage.googleapis.com/kubernetes-release/release/{{ kube_version }}/bin/linux/{{ image_arch }}/hyperkube"
 etcd_download_url: "https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-{{ image_arch }}.tar.gz"
@@ -71,6 +73,7 @@ cni_download_url: "https://github.com/containernetworking/plugins/releases/downl
 calicoctl_download_url: "https://github.com/projectcalico/calicoctl/releases/download/{{ calico_ctl_version }}/calicoctl-linux-{{ image_arch }}"
 
 # Checksums
+istioctl_checksum: fd703063c540b8c0ab943f478c05ab257d88ae27224c746a27d0526ddbf7c370
 hyperkube_checksums:
   arm64:
     v1.14.3: f29211d668cbcf1aa415dfa64aad95ffc53b5410482a23cddb680caec4e907a3
@@ -338,6 +341,93 @@ downloads:
     groups:
       - k8s-cluster
 
+  istioctl:
+    enabled: "{{ istio_enabled }}"
+    file: true
+    version: "{{ istio_version }}"
+    dest: "istio/istioctl"
+    sha256: "{{ istioctl_checksum }}"
+    source_url: "{{ istioctl_download_url }}"
+    url: "{{ istioctl_download_url }}"
+    unarchive: false
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master
+  istio_proxy:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_image_repo }}"
+    tag: "{{ istio_proxy_image_tag }}"
+    sha256: "{{ istio_proxy_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_proxy_init:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_init_image_repo }}"
+    tag: "{{ istio_proxy_init_image_tag }}"
+    sha256: "{{ istio_proxy_init_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_ca:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_ca_image_repo }}"
+    tag: "{{ istio_ca_image_tag }}"
+    sha256: "{{ istio_ca_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_mixer:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_mixer_image_repo }}"
+    tag: "{{ istio_mixer_image_tag }}"
+    sha256: "{{ istio_mixer_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_pilot:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_pilot_image_repo }}"
+    tag: "{{ istio_pilot_image_tag }}"
+    sha256: "{{ istio_pilot_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_proxy_debug:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_proxy_debug_image_repo }}"
+    tag: "{{ istio_proxy_debug_image_tag }}"
+    sha256: "{{ istio_proxy_debug_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_sidecar_initializer:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_sidecar_initializer_image_repo }}"
+    tag: "{{ istio_sidecar_initializer_image_tag }}"
+    sha256: "{{ istio_sidecar_initializer_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+  istio_statsd:
+    enabled: "{{ istio_enabled }}"
+    container: true
+    repo: "{{ istio_statsd_image_repo }}"
+    tag: "{{ istio_statsd_image_tag }}"
+    sha256: "{{ istio_statsd_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  hyperkube:
+    enabled: "{{ kubeadm_enabled == false }}"
+    container: true
+    repo: "{{ hyperkube_image_repo }}"
+    tag: "{{ hyperkube_image_tag }}"
+    sha256: "{{ hyperkube_digest_checksum|default(None) }}"
+    groups:
+      - k8s-cluster
+
   hyperkube_file:
     enabled: true
     file: true
@@ -586,6 +676,33 @@ downloads:
     repo: "{{ test_image_repo }}"
     tag: "{{ test_image_tag }}"
     sha256: "{{ testbox_digest_checksum|default(None) }}"
+
+  elasticsearch:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ elasticsearch_image_repo }}"
+    tag: "{{ elasticsearch_image_tag }}"
+    sha256: "{{ elasticsearch_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  fluentd:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ fluentd_image_repo }}"
+    tag: "{{ fluentd_image_tag }}"
+    sha256: "{{ fluentd_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  kibana:
+    enabled: "{{ efk_enabled }}"
+    container: true
+    repo: "{{ kibana_image_repo }}"
+    tag: "{{ kibana_image_tag }}"
+    sha256: "{{ kibana_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
 
   helm:
     enabled: "{{ helm_enabled }}"

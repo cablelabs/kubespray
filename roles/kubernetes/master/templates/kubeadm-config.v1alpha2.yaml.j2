@@ -93,6 +93,9 @@ apiServerExtraArgs:
 {% if kube_webhook_token_auth|default(false) %}
   authentication-token-webhook-config-file: {{ kube_config_dir }}/webhook-token-auth-config.yaml
 {% endif %}
+{% if kube_webhook_token_auth|default(false) %}
+  authentication-token-webhook-config-file: {{ kube_config_dir }}/webhook-token-auth-config.yaml
+{% endif %}
 {% if kube_encrypt_secret_data %}
   experimental-encryption-provider-config: {{ kube_cert_dir }}/secrets_encryption.yaml
 {% endif %}
