@@ -134,3 +134,9 @@ azure_exclude_master_from_standard_lb: true
 azure_disable_outbound_snat: false
 # use instance metadata service where possible
 azure_use_instance_metadata: true
+
+# This setting is used for rkt based kubelet for deploying hyperkube
+# from a docker based registry ( controls --insecure and docker:// )
+## Empty vaule for quay.io containers
+## docker for docker registry containers
+kube_hyperkube_image_repo: ""
